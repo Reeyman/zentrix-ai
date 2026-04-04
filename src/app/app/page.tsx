@@ -1,12 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageShell from "./_ui/PageShell";
 import KpiStrip from "./_ui/KpiStrip";
-import { ActionToast, Section, Card, Divider } from "./_ui/Primitives";
+import { ActionToast, Section, Card, Divider, InsightList, StatusBadge } from "./_ui/Primitives";
 import { useAppStore } from "@/lib/store";
-import type { WorkspaceOverviewPayload } from "@/types/app-models";
+import type { AppCampaignRecord, AppMode, AppWorkspaceUser, WorkspaceOverviewPayload } from "@/types/app-models";
+
+type OverviewResponse = {
+  success?: boolean;
+  error?: string;
+  data?: WorkspaceOverviewPayload;
+  mode?: AppMode;
+  workspace?: {
+    name?: string;
+    environment?: string;
+  };
+};
+
+function formatCurrency(value: number) {
+  return `$${Math.round(value).toLocaleString()}`;
+}
+
+function formatDateLabel(value: string) {
+  if (!value) {
+    return "—";
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(parsed);
+}
 
 function downloadTextFile(content: string, filename: string, contentType: string) {
   const blob = new Blob([content], { type: contentType || "text/plain;charset=utf-8" });
@@ -27,45 +59,125 @@ function toCsv(rows: string[][]) {
     .join("\n");
 }
 
+function buildKpis(campaigns: AppCampaignRecord[], users: AppWorkspaceUser[], mode: AppMode | null) {
+  const totalSpend = campaigns.reduce((sum, campaign) => sum + campaign.spend, 0);
+  const totalBudget = campaigns.reduce((sum, campaign) => sum + campaign.budget, 0);
+  const activeCampaigns = campaigns.filter((campaign) => campaign.status === "active").length;
+  const averageRoas = campaigns.length ? campaigns.reduce((sum, campaign) => sum + campaign.roas, 0) / campaigns.length : 0;
+  const activeUsers = users.filter((user) => user.status === "active").length;
+  const budgetUtilization = totalBudget > 0 ? Math.round((totalSpend / totalBudget) * 100) : 0;
+
+  return [
+    { label: "Spend", value: formatCurrency(totalSpend), delta: totalBudget ? `${budgetUtilization}% of budget used` : "no budget set" },
+    { label: "Budget", value: formatCurrency(totalBudget), delta: activeCampaigns ? `${activeCampaigns} active campaigns` : "pipeline empty" },
+    { label: "Active campaigns", value: String(activeCampaigns), delta: campaigns.length ? `${campaigns.length} tracked campaigns` : "none in scope" },
+    { label: "Avg ROAS", value: `${averageRoas.toFixed(1)}x`, delta: totalSpend ? "blended across tracked campaigns" : "awaiting spend" },
+    { label: "Active users", value: String(activeUsers), delta: users.length ? `${users.length} identities in scope` : "no members loaded" },
+    { label: "Mode", value: mode === "connected" ? "Live" : mode === "demo" ? "Demo" : "—", delta: mode === "connected" ? "connected workspace" : "local fallback" },
+  ];
+}
+
 export default function OverviewPage() {
   const router = useRouter();
   const workspaceId = useAppStore((state) => state.workspace);
-  const [toastMessage, setToastMessage] = useState<string | undefined>();
+  const [campaigns, setCampaigns] = useState<AppCampaignRecord[]>([]);
+  const [users, setUsers] = useState<AppWorkspaceUser[]>([]);
+  const [mode, setMode] = useState<AppMode | null>(null);
+  const [workspaceName, setWorkspaceName] = useState("");
+  const [workspaceEnvironment, setWorkspaceEnvironment] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | undefined>();
 
-  async function handleExportOverview() {
+  const applyOverviewPayload = useCallback((data: WorkspaceOverviewPayload, nextMode?: AppMode | null, nextWorkspaceName?: string, nextEnvironment?: string) => {
+    setCampaigns((data.campaigns ?? []).slice());
+    setUsers((data.users ?? []).slice());
+    setMode(nextMode ?? data.mode ?? null);
+    setWorkspaceName(nextWorkspaceName ?? data.currentWorkspace?.name ?? "");
+    setWorkspaceEnvironment(nextEnvironment ?? data.currentWorkspace?.environment ?? "");
+  }, []);
+
+  const loadOverview = useCallback(async (showSuccessToast = false) => {
     try {
-      setIsExporting(true);
+      setIsLoading(true);
+      setLoadError(null);
       const response = await fetch("/api/overview", {
         headers: workspaceId ? { "x-workspace-id": workspaceId } : undefined,
       });
-      const payload = await response.json() as {
-        success?: boolean;
-        error?: string;
-        data?: WorkspaceOverviewPayload;
-      };
+      const payload = await response.json() as OverviewResponse;
 
       if (!response.ok || !payload.success || !payload.data) {
-        throw new Error(payload.error || "Failed to export overview");
+        throw new Error(payload.error || "Failed to load overview");
       }
 
-      const campaigns = payload.data.campaigns ?? [];
-      const users = payload.data.users ?? [];
-      const totalSpend = campaigns.reduce((sum, campaign) => sum + campaign.spend, 0);
-      const totalBudget = campaigns.reduce((sum, campaign) => sum + campaign.budget, 0);
-      const avgRoas = campaigns.length ? campaigns.reduce((sum, campaign) => sum + campaign.roas, 0) / campaigns.length : 0;
+      applyOverviewPayload(
+        payload.data,
+        payload.mode ?? payload.data.mode ?? null,
+        typeof payload.workspace?.name === "string" ? payload.workspace.name : payload.data.currentWorkspace?.name ?? "",
+        typeof payload.workspace?.environment === "string" ? payload.workspace.environment : payload.data.currentWorkspace?.environment ?? "",
+      );
+
+      if (showSuccessToast) {
+        setToastMessage(`Overview refreshed${payload.workspace?.name ? ` for ${payload.workspace.name}` : ""}.`);
+      }
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "Failed to load overview");
+      setCampaigns([]);
+      setUsers([]);
+      setMode(null);
+      setWorkspaceName("");
+      setWorkspaceEnvironment("");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyOverviewPayload, workspaceId]);
+
+  useEffect(() => {
+    void loadOverview();
+  }, [loadOverview]);
+
+  const totalSpend = useMemo(() => campaigns.reduce((sum, campaign) => sum + campaign.spend, 0), [campaigns]);
+  const totalBudget = useMemo(() => campaigns.reduce((sum, campaign) => sum + campaign.budget, 0), [campaigns]);
+  const activeCampaignCount = useMemo(() => campaigns.filter((campaign) => campaign.status === "active").length, [campaigns]);
+  const activeUsers = useMemo(() => users.filter((user) => user.status === "active"), [users]);
+  const elevatedUsers = useMemo(() => users.filter((user) => user.role === "owner" || user.role === "admin"), [users]);
+  const topCampaign = useMemo(() => {
+    return campaigns.reduce<AppCampaignRecord | null>((current, campaign) => {
+      if (!current || campaign.roas > current.roas) {
+        return campaign;
+      }
+
+      return current;
+    }, null);
+  }, [campaigns]);
+  const kpis = useMemo(() => buildKpis(campaigns, users, mode), [campaigns, users, mode]);
+  const hasOverviewData = campaigns.length > 0 || users.length > 0;
+
+  async function handleExportOverview() {
+    try {
+      if (!hasOverviewData) {
+        setToastMessage("No overview data is available to export yet.");
+        return;
+      }
+
+      setIsExporting(true);
       const csv = toCsv([
         ["metric", "value"],
-        ["workspace", payload.data.currentWorkspace.name],
+        ["workspace", workspaceName || "Selected workspace"],
+        ["mode", mode ?? "unknown"],
+        ["environment", workspaceEnvironment || "—"],
         ["campaigns", String(campaigns.length)],
+        ["active_campaigns", String(activeCampaignCount)],
         ["users", String(users.length)],
-        ["active_campaigns", String(campaigns.filter((campaign) => campaign.status === "active").length)],
+        ["active_users", String(activeUsers.length)],
+        ["elevated_users", String(elevatedUsers.length)],
         ["total_spend", String(totalSpend)],
         ["total_budget", String(totalBudget)],
-        ["avg_roas", avgRoas.toFixed(2)],
+        ["top_campaign", topCampaign?.name ?? "—"],
       ]);
 
-      downloadTextFile(csv, `${payload.data.currentWorkspace.name.toLowerCase().replace(/\s+/g, "-")}-overview.csv`, "text/csv; charset=utf-8");
+      downloadTextFile(csv, `${(workspaceName || "workspace").toLowerCase().replace(/\s+/g, "-")}-overview.csv`, "text/csv; charset=utf-8");
       setToastMessage("Overview export downloaded.");
     } catch (error) {
       setToastMessage(error instanceof Error ? error.message : "Failed to export overview");
@@ -76,133 +188,175 @@ export default function OverviewPage() {
 
   return (
     <>
-    <PageShell
-      title="Overview"
-      subtitle="Mission Control · Last 7 days"
-      actions={
-        <>
-          <button className="btn" onClick={() => void handleExportOverview()} disabled={isExporting}>{isExporting ? "Exporting..." : "Export"}</button>
-          <button className="btn" onClick={() => router.push("/app/reports")}>Report</button>
-        </>
-      }
-    >
-      <Section>
-        <KpiStrip
-          items={[
-            { label: "Spend", value: "$45,231", delta: "+20.1% vs last period" },
-            { label: "Impressions", value: "2.3M", delta: "+15.3%" },
-            { label: "Clicks", value: "45.2K", delta: "+8.7%" },
-            { label: "CTR", value: "1.96%", delta: "-5.4%" },
-            { label: "Conversions", value: "1,245", delta: "+12.3%" },
-            { label: "ROAS", value: "3.24x", delta: "+0.8%" },
-          ]}
-        />
-      </Section>
+      <PageShell
+        title="Overview"
+        subtitle={mode === "connected" ? `Mission Control · Live workspace view for ${workspaceName || "the selected workspace"}` : `Mission Control · Demo-backed workspace view for ${workspaceName || "the selected workspace"}`}
+        actions={
+          <>
+            <button className="btn" onClick={() => void handleExportOverview()} disabled={isExporting || !hasOverviewData}>{isExporting ? "Exporting..." : "Export overview"}</button>
+            <button className="btn" onClick={() => void loadOverview(true)} disabled={isLoading}>{isLoading ? "Refreshing..." : "Refresh overview"}</button>
+          </>
+        }
+        toolbar={(
+          <>
+            <div className="page-toolbar-group">
+              <span className="toolbar-pill">{campaigns.length} monitored campaigns</span>
+              <span className="toolbar-pill">{users.length} identities in scope</span>
+            </div>
+            <div className="page-toolbar-meta">
+              <span className="toolbar-pill">{mode === "connected" ? "Connected workspace" : "Demo workspace"}</span>
+              <span className="toolbar-pill">{workspaceEnvironment || "Environment pending"}</span>
+              <span className="toolbar-pill">{activeCampaignCount} active campaigns</span>
+            </div>
+          </>
+        )}
+      >
+        {loadError ? (
+          <Section>
+            <Card title="Overview data notice">
+              <div>{loadError}</div>
+            </Card>
+          </Section>
+        ) : null}
 
-      <Divider />
+        <Section>
+          <KpiStrip items={kpis} />
+        </Section>
 
-      <div className="overview-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "20px", width: "100%", minWidth: 0 }}>
-        <div className="overview-card card" style={{ width: "100%", minWidth: 0 }}>
-          <h3 className="section-title">Spend Trend</h3>
-          <div className="card-body">
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {[
-                "Daily spend increased 15% this week",
-                "Weekend spend 30% higher than weekdays",
-                "Top performing day: Friday",
-                "Budget utilization: 87% on track",
-              ].map((text, i) => (
-                <li key={i} style={{ 
-                  position: "relative", 
-                  paddingLeft: "16px", 
-                  lineHeight: "1.4", 
-                  margin: "10px 0",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  color: "rgba(232,238,252,.78)",
-                  opacity: 0.9
-                }}>
-                  <span style={{ position: "absolute", left: 0, opacity: 0.7 }}>•</span>
-                  {text}
-                </li>
-              ))}
-            </ul>
+        <Divider />
+
+        <Section title="Executive view">
+          <div className="grid-2">
+            <Card title="Portfolio health">
+              <InsightList
+                items={[
+                  campaigns.length ? `${campaigns.length} campaigns are currently visible in ${workspaceName || "the selected workspace"}.` : "No campaigns are available for the selected workspace yet.",
+                  totalBudget ? `${formatCurrency(totalBudget)} has been allocated with ${formatCurrency(totalSpend)} currently deployed.` : "No approved budget has been set for the current portfolio.",
+                  topCampaign ? `${topCampaign.name} leads the current portfolio at ${topCampaign.roas.toFixed(1)}x ROAS.` : "No active campaign has produced live ROAS yet.",
+                ]}
+              />
+            </Card>
+            <Card title="Workspace operations">
+              <InsightList
+                items={[
+                  workspaceName ? `${workspaceName} is operating in ${workspaceEnvironment || "the selected"} environment.` : "Workspace context is not yet available.",
+                  activeUsers.length ? `${activeUsers.length} active users and ${elevatedUsers.length} elevated-access identities are currently assigned.` : "No active users are currently assigned to the workspace.",
+                  mode === "connected" ? "The overview is reading from the connected workspace source." : "The overview is currently using the local fallback workspace.",
+                ]}
+              />
+            </Card>
           </div>
-        </div>
+        </Section>
 
-        <aside className="overview-card insights-card" style={{ width: "100%", minWidth: 0 }}>
-          <h3 className="section-title">Key Insights</h3>
-          <ul>
-            {[
-              "Spend up 20% vs last period",
-              "ROAS improved by 0.8x",
-              "CPA decreased by 5%",
-              "Top campaign: Summer Sale 2024",
-              "Audience CTR above industry avg",
-            ].map((text, i) => (
-              <li key={i}>{text}</li>
-            ))}
-          </ul>
-        </aside>
-
-        <div className="overview-card card" style={{ width: "100%", minWidth: 0 }}>
-          <h3 className="section-title">ROAS/CPA Trend</h3>
-          <div className="card-body">
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {[
-                "ROAS peaked on Tuesday at 4.2x",
-                "CPA decreased by 12% this week",
-                "Mobile ROAS 25% higher than desktop",
-                "Best performing hour: 8-9 PM",
-              ].map((text, i) => (
-                <li key={i} style={{ 
-                  position: "relative", 
-                  paddingLeft: "16px", 
-                  lineHeight: "1.4", 
-                  margin: "10px 0",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  color: "rgba(232,238,252,.78)",
-                  opacity: 0.9
-                }}>
-                  <span style={{ position: "absolute", left: 0, opacity: 0.7 }}>•</span>
-                  {text}
-                </li>
+        <Section title="Recent campaigns">
+          {campaigns.length ? (
+            <div className="grid-2">
+              {campaigns.slice(0, 4).map((campaign) => (
+                <Card key={campaign.id} title={campaign.name}>
+                  <div className="detail-grid">
+                    <div className="detail-block">
+                      <div className="detail-kv"><span className="detail-kv-label">Status</span><span className="detail-kv-value"><StatusBadge status={campaign.status} /></span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">Channel</span><span className="detail-kv-value">{campaign.channel}</span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">Spend</span><span className="detail-kv-value">{formatCurrency(campaign.spend)}</span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">Budget</span><span className="detail-kv-value">{formatCurrency(campaign.budget)}</span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">ROAS</span><span className="detail-kv-value">{campaign.roas.toFixed(1)}x</span></div>
+                    </div>
+                    <div className="detail-block">
+                      <div className="detail-block-title">Timing</div>
+                      <InsightList
+                        items={[
+                          campaign.description || "No campaign description has been provided yet.",
+                          `Window: ${formatDateLabel(campaign.startDate)} to ${formatDateLabel(campaign.endDate)}.`,
+                          campaign.status === "active" ? "This campaign is currently contributing live signal." : "This campaign is not currently contributing active delivery.",
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </Card>
               ))}
-            </ul>
-          </div>
-        </div>
+            </div>
+          ) : (
+            <Card title="Campaign pipeline">
+              <InsightList
+                items={[
+                  mode === "connected" ? "No campaigns are available for the connected workspace yet." : "No campaigns are available in the current demo workspace yet.",
+                  "Create a campaign to populate the executive overview.",
+                  "Once campaigns exist, live spend, budget, and ROAS signals will appear here.",
+                ]}
+              />
+            </Card>
+          )}
+        </Section>
 
-        <div className="overview-card card" style={{ width: "100%", minWidth: 0 }}>
-          <h3 className="section-title">CTR & Conversion Rate</h3>
-          <div className="card-body">
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {[
-                "CTR improved 8% after creative refresh",
-                "Conversion rate highest on weekends",
-                "Landing page optimization: +15% CVR",
-                "Form completion rate: 73%",
-              ].map((text, i) => (
-                <li key={i} style={{ 
-                  position: "relative", 
-                  paddingLeft: "16px", 
-                  lineHeight: "1.4", 
-                  margin: "10px 0",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  color: "rgba(232,238,252,.78)",
-                  opacity: 0.9
-                }}>
-                  <span style={{ position: "absolute", left: 0, opacity: 0.7 }}>•</span>
-                  {text}
-                </li>
+        <Section title="Team coverage">
+          {users.length ? (
+            <div className="grid-2">
+              {users.slice(0, 4).map((user) => (
+                <Card key={user.id} title={user.name}>
+                  <div className="detail-grid">
+                    <div className="detail-block">
+                      <div className="detail-kv"><span className="detail-kv-label">Role</span><span className="detail-kv-value">{user.role}</span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">Status</span><span className="detail-kv-value"><StatusBadge status={user.status} /></span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">Provider</span><span className="detail-kv-value">{user.authProvider}</span></div>
+                      <div className="detail-kv"><span className="detail-kv-label">MFA</span><span className="detail-kv-value">{user.mfaEnabled ? "Enabled" : "Not enabled"}</span></div>
+                    </div>
+                    <div className="detail-block">
+                      <div className="detail-block-title">Access posture</div>
+                      <InsightList
+                        items={[
+                          user.email,
+                          user.lastActiveAt ? `Last active ${formatDateLabel(user.lastActiveAt)}.` : "No recent sign-in timestamp is available yet.",
+                          user.role === "owner" || user.role === "admin" ? "This identity has elevated workspace access." : "This identity has standard scoped access.",
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </Card>
               ))}
-            </ul>
+            </div>
+          ) : (
+            <Card title="Workspace context">
+              <InsightList
+                items={[
+                  "Workspace context is not yet available.",
+                  "User and access coverage will appear here after membership data is loaded.",
+                  mode === "connected" ? "The connected workspace is currently returning no members." : "The demo workspace is currently returning no members.",
+                ]}
+              />
+            </Card>
+          )}
+        </Section>
+
+        <Section title="Next actions">
+          <div className="grid-2">
+            <Card title="Campaign execution">
+              <InsightList
+                items={[
+                  activeCampaignCount ? `${activeCampaignCount} campaigns are currently active and ready for optimization review.` : "No active campaigns are currently running.",
+                  totalBudget ? "Review pacing and budget utilization before the next reporting window." : "Set an initial budget to activate pacing and spend controls.",
+                  "Use Campaigns to create, update, and monitor portfolio changes.",
+                ]}
+              />
+              <div style={{ marginTop: 16 }}>
+                <button className="btn" onClick={() => router.push("/app/campaigns")}>Open campaigns</button>
+              </div>
+            </Card>
+            <Card title="Reporting and governance">
+              <InsightList
+                items={[
+                  users.length ? `${users.length} identities are available for reporting and approval routing.` : "No identities are currently available for reporting workflows.",
+                  mode === "connected" ? "The workspace is ready for connected reporting and audit flows." : "The workspace is still relying on demo-backed reporting flows.",
+                  "Use Reports to review scheduled output and exports.",
+                ]}
+              />
+              <div style={{ marginTop: 16 }}>
+                <button className="btn" onClick={() => router.push("/app/reports")}>Open reports</button>
+              </div>
+            </Card>
           </div>
-        </div>
-      </div>
-    </PageShell>
-    <ActionToast message={toastMessage} onDismiss={() => setToastMessage(undefined)} />
+        </Section>
+      </PageShell>
+      <ActionToast message={toastMessage} onDismiss={() => setToastMessage(undefined)} />
     </>
   );
 }
