@@ -1032,6 +1032,51 @@ body {
   white-space: nowrap;
 }
 
+.topbar-mobile-summary{
+  display: none;
+}
+
+.topbar-mobile-summary-copy{
+  min-width: 0;
+}
+
+.topbar-mobile-summary-eyebrow{
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(186,200,235,.54);
+}
+
+.topbar-mobile-summary-title{
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(240,245,255,.95);
+}
+
+.topbar-mobile-summary-button{
+  min-height: 38px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(140,170,255,.12);
+  background: rgba(255,255,255,.03);
+  color: rgba(232,238,252,.84);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.topbar-mobile-summary-button.active{
+  border-color: rgba(140,170,255,.18);
+  background: rgba(140,170,255,.10);
+  color: rgba(243,247,255,.96);
+}
+
 @media (max-width: 1380px){
   .topbar-row-primary{
     justify-content: flex-start;
@@ -1077,8 +1122,8 @@ body {
 
 @media (max-width: 768px){
   .topbar{
-    gap: 8px;
-    padding: 10px 12px 12px;
+    gap: 10px;
+    padding: 10px 12px 8px;
   }
 
   .page-breadcrumbs{
@@ -1093,6 +1138,14 @@ body {
     font-size: 12px;
   }
 
+  .topbar-mobile-summary{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
+  }
+
   .topbar-row{
     flex-direction: column;
     align-items: stretch;
@@ -1105,8 +1158,13 @@ body {
     flex-wrap: wrap;
   }
 
+  .topbar-row-primary-compact{
+    display: none;
+  }
+
   .topbar-row-search{
-    gap: 10px;
+    gap: 8px;
+    padding-top: 0;
   }
 
   .topbar-left,
@@ -1118,6 +1176,10 @@ body {
   .topbar-left{
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .topbar-left-collapsed{
+    display: none;
   }
 
   .topbar-utility-group,
@@ -1169,6 +1231,10 @@ body {
     gap: 8px 12px;
   }
 
+  .topbar-search-placeholder{
+    font-size: 12px;
+  }
+
   .topbar-user-copy{
     display: none;
   }
@@ -1191,6 +1257,7 @@ body {
     margin-left: auto;
     padding-left: 0;
     border-left: 0;
+    gap: 10px !important;
   }
 
   .header-actions{
@@ -1975,6 +2042,98 @@ select optgroup{
 
 .enterprise-table-wrapper{
   overflow: auto;
+}
+
+.enterprise-mobile-list{
+  display: grid;
+  gap: 14px;
+}
+
+.enterprise-mobile-card{
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(140,170,255,.12);
+  background: linear-gradient(180deg, rgba(8,12,20,.92), rgba(6,10,18,.94));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.enterprise-mobile-card-interactive{
+  cursor: pointer;
+}
+
+.enterprise-mobile-card-header{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.enterprise-mobile-card-heading{
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.enterprise-mobile-card-title{
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(240,245,255,.95);
+}
+
+.enterprise-mobile-card-subtitle{
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(232,238,252,.56);
+}
+
+.enterprise-mobile-card-detail-button{
+  min-height: 34px;
+  padding: 0 12px;
+  flex: 0 0 auto;
+}
+
+.enterprise-mobile-card-body{
+  display: grid;
+  gap: 10px;
+}
+
+.enterprise-mobile-card-field{
+  display: grid;
+  grid-template-columns: minmax(0, 112px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.enterprise-mobile-card-label{
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(186,200,235,.48);
+}
+
+.enterprise-mobile-card-value{
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(236,241,252,.88);
+}
+
+.enterprise-mobile-card-value-right{
+  text-align: right;
+}
+
+.enterprise-mobile-card-actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.enterprise-mobile-card-actions .btn,
+.enterprise-mobile-card-actions .btn-primary{
+  flex: 1 1 140px;
 }
 
 .enterprise-table .table-sort-button{

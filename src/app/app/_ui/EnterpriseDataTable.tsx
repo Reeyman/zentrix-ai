@@ -96,10 +96,32 @@ export default function EnterpriseDataTable<T extends { id: string }>({
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | undefined>();
   const [activeActionId, setActiveActionId] = useState<string | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false));
 
   useEffect(() => {
     setFilterValues(Object.fromEntries(filters.map((filter) => [filter.id, 'all'])));
   }, [filters]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobileViewport(event.matches);
+    };
+
+    setIsMobileViewport(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
 
   useEffect(() => {
     setPage(1);
@@ -298,51 +320,125 @@ export default function EnterpriseDataTable<T extends { id: string }>({
           </div>
         ) : (
           <>
-            <div className="table-wrapper enterprise-table-wrapper">
-              <table className="table enterprise-table">
-                <thead>
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={column.id}
-                        className={`${column.headerClassName ?? ''} ${column.align === 'right' ? 'td-right' : ''}`.trim()}
-                      >
-                        {column.sortValue ? (
-                          <button className="table-sort-button" onClick={() => handleSort(column)}>
-                            <span>{column.header}</span>
-                            {renderSortIcon(column)}
-                          </button>
-                        ) : (
-                          column.header
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedRows.map((row) => (
-                    <tr
+            {isMobileViewport ? (
+              <div className="enterprise-mobile-list">
+                {paginatedRows.map((row) => {
+                  const cardTitle = detailTitle ? detailTitle(row) : columns[0]?.cell(row);
+                  const cardSubtitle = detailSubtitle ? detailSubtitle(row) : null;
+
+                  return (
+                    <div
                       key={row.id}
-                      className={renderDetail ? 'table-row-clickable' : ''}
+                      className={`enterprise-mobile-card ${renderDetail ? 'enterprise-mobile-card-interactive' : ''}`.trim()}
                       onClick={() => {
                         if (renderDetail) {
                           setActiveRowId(row.id);
                         }
                       }}
                     >
+                      <div className="enterprise-mobile-card-header">
+                        <div className="enterprise-mobile-card-heading">
+                          <div className="enterprise-mobile-card-title">{cardTitle}</div>
+                          {cardSubtitle ? <div className="enterprise-mobile-card-subtitle">{cardSubtitle}</div> : null}
+                        </div>
+                        {renderDetail ? (
+                          <button
+                            className="btn enterprise-mobile-card-detail-button"
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setActiveRowId(row.id);
+                            }}
+                          >
+                            Details
+                          </button>
+                        ) : null}
+                      </div>
+
+                      <div className="enterprise-mobile-card-body">
+                        {columns.slice(detailTitle ? 0 : 1).map((column) => (
+                          <div key={`${row.id}-${column.id}`} className="enterprise-mobile-card-field">
+                            <div className="enterprise-mobile-card-label">{column.header}</div>
+                            <div className={`enterprise-mobile-card-value ${column.align === 'right' ? 'enterprise-mobile-card-value-right' : ''}`.trim()}>
+                              {column.cell(row)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {rowActions.length ? (
+                        <div className="enterprise-mobile-card-actions">
+                          {rowActions.map((action) => {
+                            const actionId = `${row.id}:${action.label}`;
+
+                            return (
+                              <button
+                                key={action.label}
+                                className={action.tone === 'primary' ? 'btn btn-primary' : 'btn'}
+                                disabled={activeActionId !== null}
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  void handleRowAction(action, row);
+                                }}
+                              >
+                                {activeActionId === actionId ? action.pendingLabel ?? 'Working...' : action.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="table-wrapper enterprise-table-wrapper">
+                <table className="table enterprise-table">
+                  <thead>
+                    <tr>
                       {columns.map((column) => (
-                        <td
-                          key={`${row.id}-${column.id}`}
-                          className={`${column.className ?? ''} ${column.align === 'right' ? 'td-right' : ''}`.trim()}
+                        <th
+                          key={column.id}
+                          className={`${column.headerClassName ?? ''} ${column.align === 'right' ? 'td-right' : ''}`.trim()}
                         >
-                          {column.cell(row)}
-                        </td>
+                          {column.sortValue ? (
+                            <button className="table-sort-button" onClick={() => handleSort(column)}>
+                              <span>{column.header}</span>
+                              {renderSortIcon(column)}
+                            </button>
+                          ) : (
+                            column.header
+                          )}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {paginatedRows.map((row) => (
+                      <tr
+                        key={row.id}
+                        className={renderDetail ? 'table-row-clickable' : ''}
+                        onClick={() => {
+                          if (renderDetail) {
+                            setActiveRowId(row.id);
+                          }
+                        }}
+                      >
+                        {columns.map((column) => (
+                          <td
+                            key={`${row.id}-${column.id}`}
+                            className={`${column.className ?? ''} ${column.align === 'right' ? 'td-right' : ''}`.trim()}
+                          >
+                            {column.cell(row)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             <div className="enterprise-table-footer">
               <div className="enterprise-table-page-copy">

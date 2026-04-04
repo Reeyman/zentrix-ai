@@ -9,7 +9,6 @@ import {
   Bell,
   HelpCircle,
   Plus,
-  CalendarRange,
   Clock,
   CheckCircle2,
   ShieldCheck,
@@ -26,6 +25,7 @@ import {
   Cable,
   FileClock,
   Receipt,
+  SlidersHorizontal,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -253,6 +253,8 @@ export function Topbar({ currentWorkspace, workspaces, currentUser, mode, switch
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const [commandOpen, setCommandOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false));
+  const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [notifications] = useState(3);
   const [pendingApprovals] = useState(3);
@@ -262,6 +264,7 @@ export function Topbar({ currentWorkspace, workspaces, currentUser, mode, switch
   const userEmail = currentUser?.email ?? 'admin@adai.com';
   const userRoleLabel = currentUser?.role ? `${currentUser.role.charAt(0).toUpperCase()}${currentUser.role.slice(1)}` : 'Owner';
   const avatarInitials = getInitials(userName, userEmail);
+  const workspaceName = currentWorkspace?.name ?? 'Workspace';
 
   const openCommandPalette = useCallback((initialQuery = '') => {
     setSearchQuery(initialQuery);
@@ -347,6 +350,33 @@ export function Topbar({ currentWorkspace, workspaces, currentUser, mode, switch
   }, [commandOpen]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const syncViewport = (matches: boolean) => {
+      setIsMobileViewport(matches);
+      if (!matches) {
+        setMobileControlsOpen(false);
+      }
+    };
+    const handleChange = (event: MediaQueryListEvent) => {
+      syncViewport(event.matches);
+    };
+
+    syncViewport(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
+
+  useEffect(() => {
     function handleWindowKeyDown(event: KeyboardEvent) {
       if (
         event.key === '/' &&
@@ -372,9 +402,29 @@ export function Topbar({ currentWorkspace, workspaces, currentUser, mode, switch
   return (
     <>
       <div className="topbar">
-        <div className="topbar-row topbar-row-primary">
+        {isMobileViewport ? (
+          <div className="topbar-mobile-summary">
+            <div className="topbar-mobile-summary-copy">
+              <div className="topbar-mobile-summary-eyebrow">{workspaceEnvironment}</div>
+              <div className="topbar-mobile-summary-title">{workspaceName}</div>
+            </div>
+
+            <button
+              className={`topbar-mobile-summary-button ${mobileControlsOpen ? 'active' : ''}`.trim()}
+              type="button"
+              aria-expanded={mobileControlsOpen}
+              aria-label={mobileControlsOpen ? 'Hide workspace controls' : 'Show workspace controls'}
+              onClick={() => setMobileControlsOpen((current) => !current)}
+            >
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} />
+              {mobileControlsOpen ? 'Hide controls' : 'Workspace'}
+            </button>
+          </div>
+        ) : null}
+
+        <div className={`topbar-row topbar-row-primary ${isMobileViewport && !mobileControlsOpen ? 'topbar-row-primary-compact' : ''}`.trim()}>
           {/* Left side - Workspace & Date Range */}
-          <div className="topbar-left">
+          <div className={`topbar-left ${isMobileViewport && !mobileControlsOpen ? 'topbar-left-collapsed' : ''}`.trim()}>
             <div className="topbar-context-card">
               <div className="topbar-context-copy">
                 <div className="topbar-context-label">Workspace</div>
