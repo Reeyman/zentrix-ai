@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdAI Enterprise - Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .enterprise-gradient {
+            background: linear-gradient(135deg, #06142a 0%, #050b18 50%, #03060f 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="enterprise-gradient min-h-screen text-white">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-900 border-r border-gray-800 p-4">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold">AdAI Enterprise</h2>
+                <p class="text-sm text-gray-400">Advertising Platform</p>
+            </div>
+            
+            <nav class="space-y-6">
+                <div>
+                    <div class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-400">
+                        Main
+                        <span>▼</span>
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm rounded-md bg-blue-600 text-white">
+                            <div class="flex items-center gap-3">
+                                <span>📊</span>
+                                <span>Overview</span>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800">
+                            <div class="flex items-center gap-3">
+                                <span>🎯</span>
+                                <span>Campaigns</span>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800">
+                            <div class="flex items-center gap-3">
+                                <span>👥</span>
+                                <span>Audiences</span>
+                            </div>
+                            <span class="px-2 py-1 text-xs bg-blue-500 rounded-full">New</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-1 flex-col">
+            <!-- Topbar -->
+            <header class="h-16 bg-gray-900 border-b border-gray-800">
+                <div class="h-full px-6 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <select class="w-48 px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm">
+                            <option>Main Account</option>
+                            <option>Brand Alpha</option>
+                        </select>
+                        <select class="w-32 px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 flex-1 max-w-md mx-4">
+                        <div class="relative flex-1">
+                            <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                            <input type="text" placeholder="Search campaigns..." class="w-full pl-10 pr-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium">
+                            + Create Campaign
+                        </button>
+                        <button class="relative p-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded">
+                            <span>🔔</span>
+                            <span class="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-xs">3</span>
+                        </button>
+                        <div class="flex items-center gap-2 pl-3 border-l border-gray-700">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">U</div>
+                            <div class="text-sm">
+                                <div class="font-medium">Admin User</div>
+                                <div class="text-gray-400">admin@adai.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-auto p-6">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 class="text-3xl font-bold">Overview</h1>
+                            <p class="text-gray-400">Main Account • Last 7 days</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 border border-gray-700 rounded text-sm hover:bg-gray-800">Export</button>
+                            <button class="px-3 py-1 border border-gray-700 rounded text-sm hover:bg-gray-800">Report</button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Tiles -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">Spend</span>
+                                <span>$</span>
+                            </div>
+                            <div class="text-2xl font-bold">$45,231</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-green-400">↑ +20.1%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">Impressions</span>
+                                <span>👥</span>
+                            </div>
+                            <div class="text-2xl font-bold">2.3M</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-green-400">↑ +15.3%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">Clicks</span>
+                                <span>👆</span>
+                            </div>
+                            <div class="text-2xl font-bold">45.2K</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-green-400">↑ +8.7%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">CTR</span>
+                                <span>🎯</span>
+                            </div>
+                            <div class="text-2xl font-bold">1.96%</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-red-400">↓ -5.4%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">Conversions</span>
+                                <span>📈</span>
+                            </div>
+                            <div class="text-2xl font-bold">1,245</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-green-400">↑ +12.3%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 card-hover">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">ROAS</span>
+                                <span>$</span>
+                            </div>
+                            <div class="text-2xl font-bold">3.24x</div>
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="text-green-400">↑ +0.8%</span>
+                                <span class="text-gray-400">vs last period</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Spend Trend</h3>
+                            <div class="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-700 rounded">
+                                Chart placeholder - Spend over time
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">ROAS/CPA Trend</h3>
+                            <div class="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-700 rounded">
+                                Chart placeholder - ROAS and CPA over time
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Campaigns -->
+                    <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">Top Campaigns</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 border border-gray-800 rounded">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-1 text-xs bg-green-900 text-green-300 rounded">active</span>
+                                    <span class="font-medium">Summer Sale 2024</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-sm">
+                                    <span>$12,450</span>
+                                    <span class="font-medium">4.2x</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 border border-gray-800 rounded">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-1 text-xs bg-green-900 text-green-300 rounded">active</span>
+                                    <span class="font-medium">Brand Awareness Q3</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-sm">
+                                    <span>$8,230</span>
+                                    <span class="font-medium">2.8x</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

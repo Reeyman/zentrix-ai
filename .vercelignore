@@ -1,0 +1,40 @@
+# Dependencies
+node_modules
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+
+# Development
+.vscode
+.idea
+*.log
+
+# Environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build
+.next
+out
+dist
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+README.md
+
+# Documentation
+docs
+*.md
+
+# Scripts
+scripts

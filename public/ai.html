@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Center - AI ENTERPRISE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .enterprise-gradient {
+            background: linear-gradient(135deg, #0a0e27 0%, #151932 50%, #1a1f3a 100%);
+            min-height: 100vh;
+        }
+        .enterprise-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .ai-gradient {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        }
+        .ai-button {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            transition: all 0.2s ease;
+        }
+        .ai-button:hover {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="enterprise-gradient">
+        <div class="flex h-screen">
+            <!-- Sidebar -->
+            <div class="w-64 bg-gray-900/50 backdrop-blur-sm border-r border-gray-700/50 p-4">
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-white">AI ENTERPRISE</h2>
+                    <p class="text-sm text-gray-300">Professional Advertising Platform</p>
+                </div>
+                
+                <nav class="space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-400">
+                            Main
+                            <span>▼</span>
+                        </div>
+                        <div class="mt-2 space-y-1">
+                            <a href="index.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800/50">
+                                <div class="flex items-center gap-3">
+                                    <span>📊</span>
+                                    <span>Overview</span>
+                                </div>
+                            </a>
+                            <a href="campaigns.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800/50">
+                                <div class="flex items-center gap-3">
+                                    <span>🎯</span>
+                                    <span>Campaigns</span>
+                                </div>
+                            </a>
+                            <a href="audiences.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800/50">
+                                <div class="flex items-center gap-3">
+                                    <span>👥</span>
+                                    <span>Audiences</span>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-blue-500 rounded-full">New</span>
+                            </a>
+                            <a href="creatives.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800/50">
+                                <div class="flex items-center gap-3">
+                                    <span>🎨</span>
+                                    <span>Creatives</span>
+                                </div>
+                            </a>
+                            <a href="analytics.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-300 hover:bg-gray-800/50">
+                                <div class="flex items-center gap-3">
+                                    <span>📈</span>
+                                    <span>Analytics</span>
+                                </div>
+                            </a>
+                            <a href="ai.html" class="flex items-center justify-between px-3 py-2 text-sm rounded-md text-white bg-purple-600/20 border-l-3 border-l-purple-500">
+                                <div class="flex items-center gap-3">
+                                    <span>🤖</span>
+                                    <span>AI Center</span>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-purple-500 rounded-full">Beta</span>
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex flex-1 flex-col">
+                <!-- Topbar -->
+                <header class="h-16 bg-gray-900/50 backdrop-blur-sm border-b border-gray-700/50">
+                    <div class="h-full px-6 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <select class="w-48 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded text-sm text-white">
+                                <option>Main Account</option>
+                                <option>Brand Alpha</option>
+                            </select>
+                            <select class="w-32 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded text-sm text-white">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 flex-1 max-w-md mx-4">
+                            <div class="relative flex-1">
+                                <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                                <input type="text" placeholder="Search AI features..." class="w-full pl-10 pr-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded text-sm text-white placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <button class="ai-button px-4 py-2 text-white rounded text-sm font-semibold">
+                                🤖 AI Assistant
+                            </button>
+                            <div class="flex items-center gap-2 pl-3 border-l border-gray-700/50">
+                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">U</div>
+                                <div class="text-sm">
+                                    <div class="font-medium text-white">Admin User</div>
+                                    <div class="text-gray-400">admin@adai.com</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Main Content Area -->
+                <main class="flex-1 overflow-auto p-6">
+                    <div class="space-y-6">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-3xl font-bold text-white">AI Center</h1>
+                                <p class="text-gray-400">Advanced AI-powered advertising tools and insights</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded text-sm font-semibold">🚀 Beta</span>
+                            </div>
+                        </div>
+
+                        <!-- AI Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="enterprise-card rounded-lg p-4">
+                                <div class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">AI Predictions</div>
+                                <div class="text-2xl font-bold text-white">1,247</div>
+                                <div class="text-sm text-purple-400">94% accuracy</div>
+                            </div>
+                            <div class="enterprise-card rounded-lg p-4">
+                                <div class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Automations</div>
+                                <div class="text-2xl font-bold text-white">89</div>
+                                <div class="text-sm text-emerald-400">Active</div>
+                            </div>
+                            <div class="enterprise-card rounded-lg p-4">
+                                <div class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Time Saved</div>
+                                <div class="text-2xl font-bold text-white">42h</div>
+                                <div class="text-sm text-gray-400">This month</div>
+                            </div>
+                            <div class="enterprise-card rounded-lg p-4">
+                                <div class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">ROI Boost</div>
+                                <div class="text-2xl font-bold text-white">+28%</div>
+                                <div class="text-sm text-emerald-400">vs manual</div>
+                            </div>
+                        </div>
+
+                        <!-- AI Features Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">🎯</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Predictive Analytics</h3>
+                                <p class="text-gray-400 text-sm mb-4">AI-powered campaign performance predictions and optimization suggestions.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Launch</button>
+                            </div>
+
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">✨</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Creative Generation</h3>
+                                <p class="text-gray-400 text-sm mb-4">Generate high-performing ad creatives automatically using advanced AI.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Create</button>
+                            </div>
+
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">👥</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Audience Insights</h3>
+                                <p class="text-gray-400 text-sm mb-4">Discover hidden audience segments and behavioral patterns with AI.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Analyze</button>
+                            </div>
+
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">🤖</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Bid Optimization</h3>
+                                <p class="text-gray-400 text-sm mb-4">Automated bid management for maximum ROI across all campaigns.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Optimize</button>
+                            </div>
+
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">📊</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Smart Reports</h3>
+                                <p class="text-gray-400 text-sm mb-4">AI-generated insights and reports with actionable recommendations.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Generate</button>
+                            </div>
+
+                            <div class="enterprise-card rounded-lg p-6 hover:border-purple-500/30 transition-all">
+                                <div class="w-12 h-12 ai-gradient rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-white text-xl">⚡</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Real-time Optimization</h3>
+                                <p class="text-gray-400 text-sm mb-4">Continuous campaign optimization using machine learning algorithms.</p>
+                                <button class="ai-button px-4 py-2 text-white rounded text-sm">Activate</button>
+                            </div>
+                        </div>
+
+                        <!-- Recent AI Insights -->
+                        <div class="enterprise-card rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-white">Recent AI Insights</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3 p-3 border border-gray-700/50 rounded-lg">
+                                    <div class="w-8 h-8 ai-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-white text-sm">💡</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-white">Campaign Optimization Opportunity</h4>
+                                        <p class="text-sm text-gray-400">AI detected 23% improvement potential in "Summer Sale 2024" by adjusting audience targeting.</p>
+                                        <button class="text-purple-400 hover:text-purple-300 text-sm mt-2">Apply Suggestion</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3 p-3 border border-gray-700/50 rounded-lg">
+                                    <div class="w-8 h-8 ai-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-white text-sm">🎯</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-white">New Audience Segment Found</h4>
+                                        <p class="text-sm text-gray-400">AI identified high-value segment: "Tech-savvy professionals aged 25-35" with 4.2x ROAS potential.</p>
+                                        <button class="text-purple-400 hover:text-purple-300 text-sm mt-2">Create Segment</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
