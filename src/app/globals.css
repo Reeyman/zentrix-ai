@@ -1076,10 +1076,28 @@ body {
 }
 
 @media (max-width: 768px){
+  .topbar{
+    gap: 8px;
+    padding: 10px 12px 12px;
+  }
+
+  .page-breadcrumbs{
+    display: none;
+  }
+
+  .page-title{
+    font-size: 24px;
+  }
+
+  .page-subtitle{
+    font-size: 12px;
+  }
+
   .topbar-row{
     flex-direction: column;
     align-items: stretch;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 12px;
   }
 
   .topbar-row-primary{
@@ -1112,27 +1130,43 @@ body {
     margin-left: 0;
     justify-content: flex-start;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
   }
 
   .topbar-context-card,
   .topbar-filter-card{
     width: 100%;
+    min-width: 0;
   }
 
   .topbar-filter-card{
-    padding-left: 14px;
-    border-left: 0;
-    border-top: none;
+    padding-left: 0;
   }
 
   .topbar-control-account,
   .topbar-control-range{
-    width: auto;
-    flex: 1 1 160px;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .topbar-status-strip{
     width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .topbar-status-chip{
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .topbar-status-inline{
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px 12px;
   }
 
   .topbar-user-copy{
@@ -1143,9 +1177,32 @@ body {
     max-width: none;
   }
 
+  .topbar-primary-action{
+    width: 100%;
+    justify-content: center;
+  }
+
+  .topbar-utility-group{
+    width: auto;
+  }
+
   .topbar-account-group{
+    width: auto;
+    margin-left: auto;
     padding-left: 0;
     border-left: 0;
+  }
+
+  .header-actions{
+    width: 100%;
+    margin-top: 0;
+    flex-wrap: wrap;
+  }
+
+  .header-actions .btn,
+  .header-actions button{
+    width: 100%;
+    justify-content: center;
   }
 
   .topbar-command-shell{
@@ -2473,28 +2530,22 @@ select optgroup{
     bottom: 16px;
   }
 
-  /* Professional Enterprise Mobile Design */
-  
-  /* Hide sidebar completely on mobile - use bottom navigation instead */
-  .sidebar-shell,
-  .sidebar,
-  .sidebar-nav,
-  [class*="sidebar"],
-  aside {
+  .sidebar-shell {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
     min-width: 0 !important;
     max-width: 0 !important;
     flex: 0 !important;
-    position: absolute !important;
-    left: -9999px !important;
-    z-index: -1 !important;
+    overflow: hidden !important;
   }
 
+  .app-main,
+  .app-content,
+  .page-shell-inner,
+  .page-body,
   main,
-  .main-content,
-  [class*="main"] {
+  .main-content {
     margin-left: 0 !important;
     margin-right: 0 !important;
     width: 100% !important;
@@ -2502,93 +2553,47 @@ select optgroup{
     flex: 1 !important;
   }
 
-  /* Ensure full-width layout on mobile */
   .app-shell,
-  .shell,
-  [class*="shell"] {
+  .app-main,
+  .page-shell,
+  .page-shell-inner {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  /* Hide any sidebar-related elements */
   .sidebar-link,
   .sidebar-link-label,
   .sidebar-toggle {
     display: none !important;
   }
 
-  /* Final cleanup - ensure no sidebar remnants */
-  @media (max-width: 768px) {
-    .sidebar-shell,
-    .sidebar,
-    [class*="sidebar"] {
-      display: none !important;
-      visibility: hidden !important;
-      position: fixed !important;
-      left: -100vw !important;
-      top: -100vh !important;
-      width: 0 !important;
-      height: 0 !important;
-      overflow: hidden !important;
-      flex: 0 !important;
-      min-width: 0 !important;
-      max-width: 0 !important;
-    }
-
-    /* Override inline styles with !important */
-    .sidebar-shell[style*="width"] {
-      width: 0 !important;
-      display: none !important;
-      visibility: hidden !important;
-    }
-
-    .sidebar-shell[style*="240px"],
-    .sidebar-shell[style*="64px"] {
-      width: 0 !important;
-      display: none !important;
-      visibility: hidden !important;
-    }
-
-    /* Target the specific sidebar structure */
-    div[class*="sidebar-shell"] {
-      display: none !important;
-      width: 0 !important;
-      min-width: 0 !important;
-    }
-
-    /* Mobile login page fixes - AGGRESSIVE */
-    .login-grid {
-      grid-template-columns: 1fr !important;
-      gap: 0 !important;
-    }
-
-    .login-left-panel {
-      display: none !important;
-    }
-
-    /* Make login form full width on mobile */
-    .login-grid > section:last-child {
-      max-width: none !important;
-      width: 100% !important;
-      border-radius: 0 !important;
-      border-left: none !important;
-      border-right: none !important;
-      min-height: 100vh !important;
-    }
-
-    /* Extra aggressive - target any grid with login structure */
-    div[style*="gridTemplateColumns: minmax(0, 1.1fr) minmax(360px, 440px)"] {
-      grid-template-columns: 1fr !important;
-      gap: 0 !important;
-    }
-
-    /* Hide first section in any login grid */
-    div[style*="gridTemplateColumns: minmax(0, 1.1fr) minmax(360px, 440px)"] > section:first-child {
-      display: none !important;
-    }
+  .login-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
   }
 
-  /* Mobile bottom navigation - enterprise style */
+  .login-left-panel {
+    display: none !important;
+  }
+
+  .login-grid > section:last-child {
+    max-width: none !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    min-height: 100vh !important;
+  }
+
+  div[style*="gridTemplateColumns: minmax(0, 1.1fr) minmax(360px, 440px)"] {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  div[style*="gridTemplateColumns: minmax(0, 1.1fr) minmax(360px, 440px)"] > section:first-child {
+    display: none !important;
+  }
+
   .mobile-bottom-nav{
     display: flex !important;
     position: fixed;
@@ -2598,9 +2603,9 @@ select optgroup{
     background: rgba(6,10,18,.98);
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(140,170,255,.15);
-    padding: 12px 0;
+    padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
     z-index: 1000;
-    height: 70px;
+    height: calc(70px + env(safe-area-inset-bottom));
   }
 
   .mobile-nav-item{
@@ -2667,9 +2672,8 @@ select optgroup{
     font-weight: 600;
   }
 
-  /* Mobile content area */
   .page-shell{
-    padding: 80px 16px 90px 16px !important;
+    padding: 24px 16px calc(96px + env(safe-area-inset-bottom)) 16px !important;
     max-width: none !important;
   }
 
