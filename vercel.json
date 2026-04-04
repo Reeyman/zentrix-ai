@@ -7,18 +7,6 @@
       "maxDuration": 30
     }
   },
-  "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "@supabase-url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase-anon-key",
-    "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key",
-    "OPENAI_API_KEY": "@openai-api-key",
-    "OPENAI_MODEL": "gpt-4o-mini",
-    "NEXTAUTH_URL": "@nextauth-url",
-    "NEXTAUTH_SECRET": "@nextauth-secret",
-    "NODE_ENV": "production",
-    "ALLOWED_ORIGIN": "@allowed-origin",
-    "LOG_LEVEL": "info"
-  },
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
