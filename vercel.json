@@ -1,12 +1,6 @@
 {
   "version": 2,
   "name": "zentrix-ai",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "regions": ["iad1"],
   "functions": {
     "src/app/api/**/*.ts": {
