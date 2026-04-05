@@ -82,7 +82,7 @@ export function PricingCard({
             <div
               className={[
                 'font-semibold tracking-tight text-white',
-                isCustomPrice ? 'text-[2rem] leading-[1.02] sm:text-[2.15rem]' : 'text-4xl leading-none sm:text-5xl',
+                isCustomPrice ? 'text-[2rem] leading-[1.02] sm:text-[2.15rem]' : 'text-[2.2rem] leading-none sm:text-[2.65rem]',
               ].join(' ')}
             >
               <span className={isCustomPrice ? 'whitespace-nowrap' : undefined}>{priceLabel}</span>
