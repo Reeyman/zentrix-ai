@@ -36,12 +36,14 @@ export function PricingCard({
 }: PricingCardProps) {
   const price = billingInterval === 'monthly' ? priceMonthly : priceYearly
   const suffix = price === null ? '' : billingInterval === 'monthly' ? 'per month' : 'per year'
+  const isCustomPrice = price === null
   const billingNote =
-    price === null
+    isCustomPrice
       ? 'Tailored plan and rollout terms'
       : billingInterval === 'monthly'
         ? 'Monthly billed'
         : `${formatPlanPrice(priceYearly, currency)} billed annually`
+  const priceLabel = formatPlanPrice(price, currency)
 
   return (
     <Card
@@ -76,8 +78,15 @@ export function PricingCard({
               Best value
             </div>
           ) : null}
-          <div className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            {formatPlanPrice(price, currency)}
+          <div className="flex min-h-[52px] items-end sm:min-h-[60px]">
+            <div
+              className={[
+                'font-semibold tracking-tight text-white',
+                isCustomPrice ? 'text-[2rem] leading-[1.02] sm:text-[2.15rem]' : 'text-4xl leading-none sm:text-5xl',
+              ].join(' ')}
+            >
+              <span className={isCustomPrice ? 'whitespace-nowrap' : undefined}>{priceLabel}</span>
+            </div>
           </div>
           {suffix ? <div className="text-sm font-medium text-slate-400">{suffix}</div> : null}
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">{billingNote}</div>
