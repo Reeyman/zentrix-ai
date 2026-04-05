@@ -1,33 +1,43 @@
 import React from "react";
 
- function getStatusTone(status: string) {
-   const normalized = status.trim().toLowerCase();
+function getStatusTone(status?: string | null) {
+  const normalized = (status ?? "").trim().toLowerCase();
 
-   if (["active", "paid", "applied", "healthy", "on schedule", "enabled"].includes(normalized)) {
-     return "positive";
-   }
+  if (!normalized) {
+    return "neutral";
+  }
 
-   if (["pending", "scheduled", "warning", "open"].includes(normalized) || normalized.includes("due")) {
-     return "warning";
-   }
+  if (["active", "paid", "applied", "healthy", "on schedule", "enabled"].includes(normalized)) {
+    return "positive";
+  }
 
-   if (["paused", "draft", "archived", "disabled"].includes(normalized)) {
-     return "muted";
-   }
+  if (["pending", "scheduled", "warning", "open"].includes(normalized) || normalized.includes("due")) {
+    return "warning";
+  }
 
-   return "neutral";
- }
+  if (["paused", "draft", "archived", "disabled"].includes(normalized)) {
+    return "muted";
+  }
 
- function formatStatusLabel(status: string) {
-   if (status === status.toLowerCase()) {
-     return status
-       .split(" ")
-       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-       .join(" ");
-   }
+  return "neutral";
+}
 
-   return status;
- }
+function formatStatusLabel(status?: string | null) {
+  const normalizedStatus = (status ?? "").trim();
+
+  if (!normalizedStatus) {
+    return "Unknown";
+  }
+
+  if (normalizedStatus === normalizedStatus.toLowerCase()) {
+    return normalizedStatus
+      .split(" ")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  }
+
+  return normalizedStatus;
+}
 
 export function Section({ title, actions, children }: { title?: string; actions?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -62,11 +72,11 @@ export function InsightList({ items }: { items: string[] }) {
   );
 }
 
- export function StatusBadge({ status }: { status: string }) {
-   const tone = getStatusTone(status);
+export function StatusBadge({ status }: { status?: string | null }) {
+  const tone = getStatusTone(status);
 
-   return <span className={`status-badge status-badge-${tone}`}>{formatStatusLabel(status)}</span>;
- }
+  return <span className={`status-badge status-badge-${tone}`}>{formatStatusLabel(status)}</span>;
+}
 
 export function ActionToast({ message, onDismiss }: { message?: string; onDismiss?: () => void }) {
   if (!message) {
